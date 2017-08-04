@@ -106,6 +106,8 @@ void get_dht22() {
   oled.print(t);
   oled.println(" *C");
   oled.println(" ");
+  oled.flipVertical(true);
+  oled.flipHorizontal(true);
 
   oled.display(); // Draw the memory buffer
 }
