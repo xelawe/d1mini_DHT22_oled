@@ -41,18 +41,13 @@ void setup() {
 
   // These three lines of code are all you need to initialize the
   // OLED and print the splash screen.
-  
-  // Before you can start using the OLED, call begin() to init
-  // all of the pins and configure the OLED.
-  oled.begin();
-  // clear(ALL) will clear out the OLED's graphic memory.
-  // clear(PAGE) will clear the Arduino's display buffer.
-  oled.clear(ALL);  // Clear the display's memory (gets rid of artifacts)
-  // To actually draw anything on the display, you must call the
-  // display() function. 
-  oled.display();   
 
-  
+  oled.begin();     // Initialize the OLED
+  oled.clear(PAGE); // Clear the display's internal memory
+  oled.clear(ALL);  // Clear the library's display buffer
+  oled.display();   // Display what's in the buffer (splashscreen)
+
+
   dht.begin();
 
   //setup_wifi( );
@@ -98,6 +93,21 @@ void get_dht22() {
   Serial.print(" *C ");
   Serial.println("");
 
+  oled.clear(PAGE);  // Clear the buffer
+  oled.setFontType(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
+  oled.setCursor(0, 0); // points cursor to x=27 y=0
+
+  oled.println("Humidity:");
+  oled.print(h);
+  oled.println(" %\t");
+  oled.println(" ");
+
+  oled.println("Temp.: ");
+  oled.print(t);
+  oled.println(" *C");
+  oled.println(" ");
+
+  oled.display(); // Draw the memory buffer
 }
 
 
