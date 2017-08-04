@@ -1,10 +1,15 @@
+
+
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
 
 #include "DHT.h"
-
-#include <ESP8266WiFi.h>
 #include <Metro.h>
+
+#include <SFE_MicroOLED.h>  // Include the SFE_MicroOLED library
+
+#define PIN_RESET 255  //
+#define DC_JUMPER 0  // I2C Addres: 0 - 0x3C, 1 - 0x3D
 
 #define DHTPIN D5    // what digital pin we're connected to
 
@@ -25,11 +30,8 @@
 // tweak the timings for faster processors.  This parameter is no longer needed
 // as the current DHT reading algorithm adjusts itself to work on faster procs.
 DHT dht(DHTPIN, DHTTYPE);
+MicroOLED oled(PIN_RESET, DC_JUMPER); // Example I2C declaration
 
-const char* ssid     = "cytron";
-const char* password = "Trust no 1. Make it so!";
-
-const char* host = "wernhart.net";
 
 Metro go_metro = Metro(1000);
 
@@ -37,9 +39,23 @@ void setup() {
   Serial.begin(115200);
   Serial.println("DHTxx test!");
 
+  // These three lines of code are all you need to initialize the
+  // OLED and print the splash screen.
+  
+  // Before you can start using the OLED, call begin() to init
+  // all of the pins and configure the OLED.
+  oled.begin();
+  // clear(ALL) will clear out the OLED's graphic memory.
+  // clear(PAGE) will clear the Arduino's display buffer.
+  oled.clear(ALL);  // Clear the display's memory (gets rid of artifacts)
+  // To actually draw anything on the display, you must call the
+  // display() function. 
+  oled.display();   
+
+  
   dht.begin();
 
-  setup_wifi( );
+  //setup_wifi( );
 
   do_sensor();
 }
@@ -82,68 +98,6 @@ void get_dht22() {
   Serial.print(" *C ");
   Serial.println("");
 
-  send_val(19, t);
-  send_val(20, h);
-}
-
-void send_val(int iv_sens_nbr, float iv_value) {
-  
-  Serial.print("connecting to ");
-  Serial.println(host);
-
-  // Use WiFiClient class to create TCP connections
-  WiFiClient client;
-  const int httpPort = 80;
-  if (!client.connect(host, httpPort)) {
-    Serial.println("connection failed");
-    return;
-  }
-
-  // We now create a URI for the request
-  String url = "/ip/weather_upd?station=1&sensor=";
-  url += iv_sens_nbr;
-  url += "&value=";
-  url += iv_value;
-
-  Serial.print("Requesting URL: ");
-  Serial.println(url);
-
-  // This will send the request to the server
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Authorization: Basic aXA6ZGltcHdmaXUwNw==\r\n" +
-               "Connection: close\r\n\r\n");
-  delay(10);
-
-  // Read all the lines of the reply from server and print them to Serial
-  while (client.available()) {
-    String line = client.readStringUntil('\r');
-    Serial.print(line);
-  }
-
-  Serial.println();
-  Serial.println("closing connection");
-}
-
-void setup_wifi( ) {
-  // We start by connecting to a WiFi network
-
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
 }
 
 
