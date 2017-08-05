@@ -33,7 +33,7 @@ DHT dht(DHTPIN, DHTTYPE);
 MicroOLED oled(PIN_RESET, DC_JUMPER); // Example I2C declaration
 
 
-Metro go_metro = Metro(1000);
+Metro go_metro = Metro(2000);
 
 void setup() {
   Serial.begin(115200);
@@ -99,12 +99,12 @@ void get_dht22() {
 
   oled.println("Humidity:");
   oled.print(h);
-  oled.println(" %\t");
+  oled.println(" %");
   oled.println(" ");
 
   oled.println("Temp.: ");
   oled.print(t);
-  oled.println(" *C");
+  oled.println(" \tC");
   oled.println(" ");
   
   oled.flipVertical(true);
