@@ -33,7 +33,7 @@ DHT dht(DHTPIN, DHTTYPE);
 MicroOLED oled(PIN_RESET, DC_JUMPER); // Example I2C declaration
 
 
-Metro go_metro = Metro(2000);
+Metro go_metro = Metro(4000);
 
 void setup() {
   Serial.begin(115200);
@@ -61,6 +61,8 @@ void loop() {
     do_sensor();
 
   }
+
+ delay(500);
 
 
 }
