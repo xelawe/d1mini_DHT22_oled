@@ -12,9 +12,10 @@
 #include "cy_weather.h"
 
 #include "DHT.h"
-#include <Metro.h>
+#include <Ticker.h>
 
 #include <SFE_MicroOLED.h>  // Include the SFE_MicroOLED library
+
 
 #define PIN_RESET 255  //
 #define DC_JUMPER 0  // I2C Addres: 0 - 0x3C, 1 - 0x3D
@@ -40,8 +41,12 @@
 DHT dht(DHTPIN, DHTTYPE);
 MicroOLED oled(PIN_RESET, DC_JUMPER); // Example I2C declaration
 
+Ticker TickMeas;
+boolean gv_TickMeas;
 
-Metro go_metro = Metro(5000);
+void HandleTickMeas( ){
+  gv_TickMeas = true;
+}
 
 void setup() {
 #ifdef serdebug
@@ -61,7 +66,7 @@ void setup() {
   oled.setCursor(0, 0); // points cursor to x=0 y=0
   oled.println("try WiFi");
   oled.display();   // Display what's in the buffer (splashscreen)
-  
+
   wifi_init("D1DHTOLED");
 
   oled.clear(PAGE); // Clear the display's internal memory
@@ -77,14 +82,17 @@ void setup() {
 
   dht.begin();
   do_sensor();
+  gv_TickMeas = false;
+  TickMeas.attach(10, HandleTickMeas);
 }
 
 void loop() {
   check_ota();
 
-  if (go_metro.check() == 1) {
+  if (gv_TickMeas == true) {
 
     do_sensor();
+    gv_TickMeas = false;
 
   }
 
@@ -125,17 +133,15 @@ void get_dht22() {
   oled.setFontType(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
   oled.setCursor(0, 0); // points cursor to x=0 y=0
 
-  oled.println("Humidity:");
+  oled.println("Humidity: ");
   oled.print(h);
-  oled.println(" %");
+  oled.println(" % ");
   oled.println(" ");
 
-  oled.println("Temp.:");
+  oled.println("Temp.: ");
   oled.print(t);
   oled.println(" \tC");
   oled.println(" ");
-
-
 
   oled.display(); // Draw the memory buffer
 }
