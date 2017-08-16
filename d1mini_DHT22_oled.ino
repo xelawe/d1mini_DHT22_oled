@@ -8,7 +8,8 @@
 #endif
 
 #include "cy_wifi.h"
-#include "cy_ota.h"
+#include "cy_ota.h""
+#include "cy_weather.h"
 
 #include "DHT.h"
 #include <Metro.h>
@@ -40,24 +41,39 @@ DHT dht(DHTPIN, DHTTYPE);
 MicroOLED oled(PIN_RESET, DC_JUMPER); // Example I2C declaration
 
 
-Metro go_metro = Metro(4000);
+Metro go_metro = Metro(5000);
 
 void setup() {
+#ifdef serdebug
   Serial.begin(115200);
-
-  wifi_init("D1DHTOLED");
-  delay(500);
-
-  init_ota("D1DHTOLED");
+#endif
+  DebugPrintln("\n" + String(__DATE__) + ", " + String(__TIME__) + " " + String(__FILE__));
 
   // These three lines of code are all you need to initialize the
   // OLED and print the splash screen.
 
   oled.begin();     // Initialize the OLED
+  oled.flipVertical(true);
+  oled.flipHorizontal(true);
   oled.clear(PAGE); // Clear the display's internal memory
   oled.clear(ALL);  // Clear the library's display buffer
+  oled.setFontType(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
+  oled.setCursor(0, 0); // points cursor to x=0 y=0
+  oled.println("try WiFi");
+  oled.display();   // Display what's in the buffer (splashscreen)
+  
+  wifi_init("D1DHTOLED");
+
+  oled.clear(PAGE); // Clear the display's internal memory
+  oled.clear(ALL);  // Clear the library's display buffer
+  oled.setFontType(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
+  oled.setCursor(0, 0); // points cursor to x=0 y=0
+  oled.println("WiFi OK");
   oled.display();   // Display what's in the buffer (splashscreen)
 
+  delay(500);
+
+  init_ota("D1DHTOLED");
 
   dht.begin();
   do_sensor();
@@ -65,14 +81,14 @@ void setup() {
 
 void loop() {
   check_ota();
-  
+
   if (go_metro.check() == 1) {
 
     do_sensor();
 
   }
 
- delay(500);
+  delay(500);
 
 
 }
@@ -93,34 +109,33 @@ void get_dht22() {
 
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t)) {
-    Serial.println("Failed to read from DHT sensor!");
+    DebugPrintln("Failed to read from DHT sensor!");
     return;
   }
 
-  Serial.print("Humidity: ");
-  Serial.print(h);
-  Serial.print(" %\t");
-  Serial.print("Temperature: ");
-  Serial.print(t);
-  Serial.print(" *C ");
-  Serial.println("");
+  DebugPrint("Humidity: ");
+  DebugPrint(h);
+  DebugPrint(" % \t");
+  DebugPrint("Temperature: ");
+  DebugPrint(t);
+  DebugPrint(" *C ");
+  DebugPrintln("");
 
   oled.clear(PAGE);  // Clear the buffer
   oled.setFontType(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
-  oled.setCursor(0, 0); // points cursor to x=27 y=0
+  oled.setCursor(0, 0); // points cursor to x=0 y=0
 
   oled.println("Humidity:");
   oled.print(h);
   oled.println(" %");
   oled.println(" ");
 
-  oled.println("Temp.: ");
+  oled.println("Temp.:");
   oled.print(t);
   oled.println(" \tC");
   oled.println(" ");
-  
-  oled.flipVertical(true);
-  oled.flipHorizontal(true);
+
+
 
   oled.display(); // Draw the memory buffer
 }
