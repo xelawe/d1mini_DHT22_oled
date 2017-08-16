@@ -1,7 +1,14 @@
+#define serdebug
+#ifdef serdebug
+#define DebugPrint(...) {  Serial.print(__VA_ARGS__); }
+#define DebugPrintln(...) {  Serial.println(__VA_ARGS__); }
+#else
+#define DebugPrint(...) { }
+#define DebugPrintln(...) { }
+#endif
 
-
-// Example testing sketch for various DHT humidity/temperature sensors
-// Written by ladyada, public domain
+#include "cy_wifi.h"
+#include "cy_ota.h"
 
 #include "DHT.h"
 #include <Metro.h>
@@ -37,7 +44,11 @@ Metro go_metro = Metro(4000);
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("DHTxx test!");
+
+  wifi_init("D1DHTOLED");
+  delay(500);
+
+  init_ota("D1DHTOLED");
 
   // These three lines of code are all you need to initialize the
   // OLED and print the splash screen.
@@ -49,13 +60,12 @@ void setup() {
 
 
   dht.begin();
-
-  //setup_wifi( );
-
   do_sensor();
 }
 
 void loop() {
+  check_ota();
+  
   if (go_metro.check() == 1) {
 
     do_sensor();
