@@ -133,17 +133,15 @@ void get_dht22() {
   oled.setFontType(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
   oled.setCursor(0, 0); // points cursor to x=0 y=0
 
-  oled.println("Humidity: ");
+  oled.println("Humidity");
   oled.print(h);
   oled.println(" % ");
   oled.println(" ");
 
-  oled.println("Temp.: ");
+  oled.println("Temp.");
   oled.print(t);
   oled.println(" \tC");
   oled.println(" ");
 
   oled.display(); // Draw the memory buffer
 }
-
-
