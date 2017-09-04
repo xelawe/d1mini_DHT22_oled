@@ -41,6 +41,8 @@
 DHT dht(DHTPIN, DHTTYPE);
 MicroOLED oled(PIN_RESET, DC_JUMPER); // Example I2C declaration
 
+const char* gv_hostname = "D1DHTOLED";
+
 Ticker TickMeas;
 boolean gv_TickMeas;
 
@@ -67,7 +69,7 @@ void setup() {
   oled.println("try WiFi");
   oled.display();   // Display what's in the buffer (splashscreen)
 
-  wifi_init("D1DHTOLED");
+  wifi_init(gv_hostname);
 
   oled.clear(PAGE); // Clear the display's internal memory
   oled.clear(ALL);  // Clear the library's display buffer
@@ -78,7 +80,7 @@ void setup() {
 
   delay(500);
 
-  init_ota("D1DHTOLED");
+  init_ota(gv_hostname);
 
   dht.begin();
   do_sensor();
